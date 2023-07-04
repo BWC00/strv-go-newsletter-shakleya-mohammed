@@ -10,7 +10,7 @@ import (
 
 	"github.com/rs/zerolog"
 
-	"example.com/myapp/util/logger"
+	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/logger"
 )
 
 // setup would normally be an init() function, however, there seems
