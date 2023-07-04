@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm"
 	"github.com/go-chi/chi/v5"
 	vd "github.com/go-playground/validator/v10"
+	"firebase.google.com/go/v4/db"
 
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/config"
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/logger"
@@ -22,6 +23,7 @@ import (
 type Server struct {
 	cfg            *config.Config
 	postgresDB     *gorm.DB
+	firebaseDB     *db.Ref
  	validator      *vd.Validate
 	logger         *logger.Logger
 	router         *chi.Mux
@@ -42,6 +44,7 @@ func (s *Server) Init() {
 	s.newValidator()
 	s.newRouter()
 	s.newPostgresDB()
+	s.newFirebaseDB()
 }
 
 func (s *Server) newLogger() {
@@ -60,6 +63,13 @@ func (s *Server) newPostgresDB() {
 	var err error
 	if s.postgresDB, err = databases.NewPostgresDB(&s.cfg.DB.RDBMS, s.logger); err != nil {
 		s.logger.Fatal().Err(err).Msg("error initializing postgres database")
+	}
+}
+
+func (s *Server) newFirebaseDB() {
+	var err error
+	if s.firebaseDB, err = databases.NewFirebaseDB(&s.cfg.DB.Firebase); err != nil {
+		s.logger.Fatal().Err(err).Msg("error initializing firebase database")
 	}
 }
 
