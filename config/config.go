@@ -8,6 +8,7 @@ import (
 
 // Configuration - server, databases and email service configuration variables
 type Config struct {
+	DB         DatabaseConfig
 	Server     ServerConfig
 }
 
