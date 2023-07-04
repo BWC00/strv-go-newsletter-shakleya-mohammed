@@ -71,7 +71,7 @@ func (s *Server) Run() {
 		start(s)
 	}()
 
-	_ = gracefulShutdown(context.Background(), s)
+	_ = gracefulShutdown(s)
 }
 
 func start(s *Server) {
@@ -81,7 +81,7 @@ func start(s *Server) {
 	}
 }
 
-func gracefulShutdown(ctx context.Context, s *Server) error {
+func gracefulShutdown(s *Server) error {
 	sigint := make(chan os.Signal, 1)
 	signal.Notify(sigint, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	<-sigint

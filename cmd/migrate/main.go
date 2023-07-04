@@ -23,6 +23,9 @@ var (
 
 func main() {
 	dirx, err := os.Getwd()
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
 	fmt.Println("Current directory:", dirx)
 
 	flags.Usage = usage
@@ -39,8 +42,8 @@ func main() {
 	c := config.New()
 	dbString := fmt.Sprintf(fmtDBString, c.DB.RDBMS.Host, c.DB.RDBMS.Username, c.DB.RDBMS.Password, c.DB.RDBMS.DBName, c.DB.RDBMS.Port)
 
-	db, err := goose.OpenDBWithDriver(dialect, dbString)
-	if err != nil {
+	db, err2 := goose.OpenDBWithDriver(dialect, dbString)
+	if err2 != nil {
 		log.Fatalf(err.Error())
 	}
 
