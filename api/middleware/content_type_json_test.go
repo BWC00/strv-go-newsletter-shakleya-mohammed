@@ -7,6 +7,9 @@ import (
 	"testing"
 
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/api/middleware"
+	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/config"
+	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/logger"
+	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/validator"
 )
 
 var (
@@ -18,7 +21,11 @@ func TestContentTypeJson(t *testing.T) {
 	r, _ := http.NewRequest("GET", "/", nil)
 	rr := httptest.NewRecorder()
 
-	middleware.ContentTypeJson(http.HandlerFunc(sampleHandlerFunc())).ServeHTTP(rr, r)
+	cfg := config.New()
+
+	middlewareHandlers := middleware.New(logger.New(cfg.Server.Debug), validator.New())
+
+	middlewareHandlers.ContentTypeJson(http.HandlerFunc(sampleHandlerFunc())).ServeHTTP(rr, r)
 	response := rr.Result()
 
 	if respBody := rr.Body.String(); respBody != expRespBody {
