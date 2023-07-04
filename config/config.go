@@ -10,6 +10,7 @@ import (
 type Config struct {
 	DB         DatabaseConfig
 	Server     ServerConfig
+	Email  	   EmailConfig
 }
 
 func New() *Config {

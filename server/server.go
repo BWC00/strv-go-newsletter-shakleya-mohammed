@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm"
 	"github.com/go-chi/chi/v5"
 	vd "github.com/go-playground/validator/v10"
+	"github.com/sendgrid/sendgrid-go"
 	"firebase.google.com/go/v4/db"
 
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/config"
@@ -24,6 +25,7 @@ type Server struct {
 	cfg            *config.Config
 	postgresDB     *gorm.DB
 	firebaseDB     *db.Ref
+	sendGridClient *sendgrid.Client
  	validator      *vd.Validate
 	logger         *logger.Logger
 	router         *chi.Mux
@@ -45,6 +47,7 @@ func (s *Server) Init() {
 	s.newRouter()
 	s.newPostgresDB()
 	s.newFirebaseDB()
+	s.newSendGridClient()
 }
 
 func (s *Server) newLogger() {
@@ -71,6 +74,10 @@ func (s *Server) newFirebaseDB() {
 	if s.firebaseDB, err = databases.NewFirebaseDB(&s.cfg.DB.Firebase); err != nil {
 		s.logger.Fatal().Err(err).Msg("error initializing firebase database")
 	}
+}
+
+func (s *Server) newSendGridClient() {
+	s.sendGridClient = sendgrid.NewSendClient(s.cfg.Email.SendGrid.ApiKey)
 }
 
 
