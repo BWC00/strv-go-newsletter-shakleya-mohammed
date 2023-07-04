@@ -21,7 +21,7 @@ func NewFirebaseDB(cfg *config.Firebase) (*db.Ref, error) {
 
 	serviceAccountKeyFilePath, err := filepath.Abs(cfg.FirebaseCredPath)
 	if err != nil {
-		return nil, errors.New("Unable to load serviceAccountKeys.json file")
+		return nil, errors.New("unable to load serviceAccountKeys.json file")
 	}
 	// Fetch the service account key JSON file contents
 	opt := option.WithCredentialsFile(serviceAccountKeyFilePath)
