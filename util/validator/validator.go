@@ -13,6 +13,12 @@ const (
 	alphaSpaceRegexString string = "^[a-zA-Z ]+$"
 )
 
+type key int
+
+const (
+    KeyID key = iota
+)
+
 type ErrResponse struct {
 	Errors []string `json:"errors"`
 }
