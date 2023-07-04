@@ -11,11 +11,13 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/config"
+	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/logger"
 
 )
 
 type Server struct {
 	cfg            *config.Config
+	logger         *logger.Logger
 	router         *chi.Mux
 	httpServer     *http.Server
 }
@@ -30,12 +32,18 @@ func New() *Server {
 // INIT SERVER
 
 func (s *Server) Init() {
+	s.newLogger()
 	s.newRouter()
+}
+
+func (s *Server) newLogger() {
+	s.logger = logger.New(s.cfg.Server.Debug)
 }
 
 func (s *Server) newRouter() {
 	s.router = chi.NewRouter()
 }
+
 
 //START SERVER
 
@@ -56,8 +64,9 @@ func (s *Server) Run() {
 }
 
 func start(s *Server) {
+	s.logger.Info().Msgf("Starting server %v", s.httpServer.Addr)
 	if err := s.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		return
+		s.logger.Fatal().Err(err).Msg("Server startup failure")
 	}
 }
 
@@ -66,11 +75,13 @@ func gracefulShutdown(ctx context.Context, s *Server) error {
 	signal.Notify(sigint, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	<-sigint
 
+	s.logger.Info().Msgf("Shutting down server %v", s.httpServer.Addr)
+
 	ctx, cancel := context.WithTimeout(context.Background(), s.cfg.Server.TimeoutIdle)
 	defer cancel()
 
 	if err := s.httpServer.Shutdown(ctx); err != nil {
-		return err
+		s.logger.Error().Err(err).Msg("Server shutdown failure")
 	}
 
 	return nil
