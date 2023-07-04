@@ -21,7 +21,7 @@ type RDBMS struct {
 	Password string 					 `env:"DB_PASS,required"`
 	DBName   string 					 `env:"DB_NAME,required"`
 	Debug    bool   					 `env:"DB_DEBUG,required"`
-	MaxConnectionPool      int           `env:"DB_MAX_CONNECTION_POOL",default:"4"`
-	MaxIdleConnections     int           `env:"DB_MAX_IDLE_CONNECTIONS",default:"4"`
-	ConnectionsMaxLifeTime time.Duration `env:"DB_CONNECTIONS_MAX_LIFETIME",default:"300s"`
+	MaxConnectionPool      int           `env:"DB_MAX_CONNECTION_POOL" default:"4"`
+	MaxIdleConnections     int           `env:"DB_MAX_IDLE_CONNECTIONS" default:"4"`
+	ConnectionsMaxLifeTime time.Duration `env:"DB_CONNECTIONS_MAX_LIFETIME" default:"300s"`
 }
