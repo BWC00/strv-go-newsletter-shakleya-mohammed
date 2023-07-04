@@ -3,6 +3,7 @@ module github.com/bwc00/strv-go-newsletter-shakleya-mohammed
 go 1.20
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/go-chi/chi/v5 v5.0.8 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
