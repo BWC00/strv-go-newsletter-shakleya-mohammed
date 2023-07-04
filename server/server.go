@@ -17,7 +17,11 @@ import (
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/config"
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/logger"
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/validator"
+	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/api/middleware"
 	databases "github.com/bwc00/strv-go-newsletter-shakleya-mohammed/database"
+	subscriptionAPI "github.com/bwc00/strv-go-newsletter-shakleya-mohammed/api/resource/subscription/handler"
+	newsletterAPI "github.com/bwc00/strv-go-newsletter-shakleya-mohammed/api/resource/newsletter/handler"
+	userAPI "github.com/bwc00/strv-go-newsletter-shakleya-mohammed/api/resource/user/handler"
 
 )
 
@@ -45,9 +49,11 @@ func (s *Server) Init() {
 	s.newLogger()
 	s.newValidator()
 	s.newRouter()
+	s.setGlobalMiddleware()
 	s.newPostgresDB()
 	s.newFirebaseDB()
 	s.newSendGridClient()
+	s.registerHTTPEndPoints()
 }
 
 func (s *Server) newLogger() {
@@ -60,6 +66,18 @@ func (s *Server) newValidator() {
 
 func (s *Server) newRouter() {
 	s.router = chi.NewRouter()
+}
+
+func (s *Server) setGlobalMiddleware() {
+	s.router.NotFound(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		_, _ = w.Write([]byte(`{"message": "endpoint not found"}`))
+	})
+	middlewareHandlers := middleware.New(s.logger, s.validator)
+	s.router.Use(middlewareHandlers.ContentTypeJson)
+	// s.router.Use(middleware.Json)
+	// s.router.Use(middleware.Recovery)
 }
 
 func (s *Server) newPostgresDB() {
@@ -78,6 +96,19 @@ func (s *Server) newFirebaseDB() {
 
 func (s *Server) newSendGridClient() {
 	s.sendGridClient = sendgrid.NewSendClient(s.cfg.Email.SendGrid.ApiKey)
+}
+
+func (s *Server) registerHTTPEndPoints() {
+
+	s.router.Get("/live", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("."))
+	})
+
+	// s.router.Route("/api/v1", func(router chi.Router) {
+		subscriptionAPI.RegisterHTTPEndPoints(s.router, s.logger, s.validator, s.postgresDB, s.firebaseDB, s.sendGridClient, &s.cfg.Email)
+		newsletterAPI.RegisterHTTPEndPoints(s.router, s.logger, s.validator, s.postgresDB)
+		userAPI.RegisterHTTPEndPoints(s.router, s.logger, s.validator, s.postgresDB)
+	// })
 }
 
 

@@ -45,7 +45,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/bwc00/myapp
+          images: ghcr.io/bwc00/strv-go-newsletter-shakleya-mohammed
 
       - name: Build and push
         uses: docker/build-push-action@v4
@@ -54,6 +54,6 @@ jobs:
           file: ./prod.Dockerfile
           platforms: linux/amd64,linux/arm64
           tags: |
-            ghcr.io/bwc00/myapp:latest
-            ghcr.io/bwc00/myapp:${{github.ref_name}}
+            ghcr.io/bwc00/strv-go-newsletter-shakleya-mohammed:latest
+            ghcr.io/bwc00/strv-go-newsletter-shakleya-mohammed:${{github.ref_name}}
           labels: ${{ steps.meta.outputs.labels }}
