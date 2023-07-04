@@ -10,9 +10,11 @@ import (
 
 	"gorm.io/gorm"
 	"github.com/go-chi/chi/v5"
+	vd "github.com/go-playground/validator/v10"
 
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/config"
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/logger"
+	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/validator"
 	databases "github.com/bwc00/strv-go-newsletter-shakleya-mohammed/database"
 
 )
@@ -20,6 +22,7 @@ import (
 type Server struct {
 	cfg            *config.Config
 	postgresDB     *gorm.DB
+ 	validator      *vd.Validate
 	logger         *logger.Logger
 	router         *chi.Mux
 	httpServer     *http.Server
@@ -36,12 +39,17 @@ func New() *Server {
 
 func (s *Server) Init() {
 	s.newLogger()
+	s.newValidator()
 	s.newRouter()
 	s.newPostgresDB()
 }
 
 func (s *Server) newLogger() {
 	s.logger = logger.New(s.cfg.Server.Debug)
+}
+
+func (s *Server) newValidator() {
+	s.validator = validator.New()
 }
 
 func (s *Server) newRouter() {
