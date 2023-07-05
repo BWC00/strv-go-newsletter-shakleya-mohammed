@@ -23,7 +23,7 @@ func (m *Middleware) Authentication(next http.Handler) http.Handler {
 			e.ServerError(w, e.TokenExtractionFailure)
 		}
 
-		ctx := context.WithValue(r.Context(), validator.KeyID, userId)
+		ctx := context.WithValue(r.Context(), validator.UserKeyID, userId)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

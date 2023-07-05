@@ -39,7 +39,7 @@ func (m *Middleware) ValidateSubscription(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), validator.KeyID, subscription)
+		ctx := context.WithValue(r.Context(), validator.ResourceKeyID, subscription)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

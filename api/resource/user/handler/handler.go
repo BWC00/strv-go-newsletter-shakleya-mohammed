@@ -44,13 +44,14 @@ func New(logger *logger.Logger, validator *vd.Validate, postgresDB *gorm.DB) *AP
 //	@router			/register [post]
 func (a *API) Register(w http.ResponseWriter, r *http.Request) {
 
-	user := r.Context().Value(validator.KeyID).(*user.User)
+	user := r.Context().Value(validator.ResourceKeyID).(*user.User)
 
 	token, err := a.repository.RegisterUser(user)
 	if err != nil {
 		if err.Error() == e.FieldNotUnique {
 			a.logger.Error().Err(err).Msg("email already taken")
 			e.BadRequest(w, e.FieldNotUnique)
+			return
 		}
 		a.logger.Error().Err(err).Msg("unable to register user")
 		e.ServerError(w, e.DataCreationFailure)
@@ -83,13 +84,14 @@ func (a *API) Register(w http.ResponseWriter, r *http.Request) {
 //	@router			/login [post]
 func (a *API) Login(w http.ResponseWriter, r *http.Request) {
 
-	user := r.Context().Value(validator.KeyID).(*user.User)
+	user := r.Context().Value(validator.ResourceKeyID).(*user.User)
 
 	token, err := a.repository.LoginUser(user)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			a.logger.Error().Err(err).Msg("email doesn't exist")
 			e.BadRequest(w, e.ResourceNotFound)
+			return
 		}
 		a.logger.Error().Err(err).Msg("password not correct")
 		e.BadRequest(w, e.AuthenticationFailure)

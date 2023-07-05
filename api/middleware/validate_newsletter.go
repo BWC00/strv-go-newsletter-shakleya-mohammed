@@ -39,7 +39,7 @@ func (m *Middleware) ValidateNewsletter(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), validator.KeyID, newsletter)
+		ctx := context.WithValue(r.Context(), validator.ResourceKeyID, newsletter)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

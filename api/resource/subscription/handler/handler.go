@@ -52,7 +52,7 @@ func New(logger *logger.Logger, validator *vd.Validate, postgresDB *gorm.DB, fir
 //	@router			/subscriptions [post]
 func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
 	
-	subscription := r.Context().Value(validator.KeyID).(*subscription.Subscription)
+	subscription := r.Context().Value(validator.ResourceKeyID).(*subscription.Subscription)
 
 	subscriptionID, err := a.repository.Subscribe(subscription)
 	if err != nil {
@@ -74,7 +74,7 @@ func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
 
 	subject := "Subscribed to newsletter!"
 	plainTextContent := "Subscribed to newsletter!"
-	htmlContent := fmt.Sprintf("Subscribed! link to unsubscribe: <a href='http://localhost:8080/api/v1/unsubscribe?subscriptionid=%s'>unsubscribeYou</a>", subscriptionID)
+	htmlContent := fmt.Sprintf("Subscribed! link to unsubscribe: <a href='http://localhost:8080/subscriptions?id=%s'>unsubscribeYou</a>", subscriptionID)
 
 	if err := email.Send(
 		a.sendGridClient,
@@ -88,6 +88,7 @@ func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
 	); err != nil {
 		a.logger.Error().Err(err).Msg("Unable to send email subscription confirmation")
 		e.ServerError(w, e.SendingEmailFailure)
+		return
 	}
 
 	a.logger.Info().Str("email", subscription.Email).Msg("subscribed to newsletter")
@@ -103,7 +104,6 @@ func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
 //	@produce		json
 //	@param			id		path		string	true	"Subscription ID"
 //	@success		204
-//	@failure		404		{object}	err.Error
 //	@failure		500		{object}	err.Error
 //	@router			/subscriptions [delete]
 func (a *API) Unsubscribe(w http.ResponseWriter, r *http.Request) {
@@ -111,12 +111,7 @@ func (a *API) Unsubscribe(w http.ResponseWriter, r *http.Request) {
 	subscriptionID := r.URL.Query().Get("id")
 
 	if err := a.repository.Unsubscribe(subscriptionID); err != nil {
-		if err.Error() == e.ResourceNotFound {
-			a.logger.Error().Err(err).Msg("subscription not found")
-			e.NotFoundErrors(w, e.ResourceNotFound)
-			return
-		}
-		a.logger.Error().Err(err).Msg("unable to unsubscribe")
+		a.logger.Error().Err(err).Msg("unable to delete subscription")
 		e.ServerError(w, e.DataDeletionFailure)
 		return
 	}

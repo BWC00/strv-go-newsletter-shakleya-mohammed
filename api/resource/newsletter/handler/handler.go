@@ -43,7 +43,7 @@ func New(logger *logger.Logger, validator *vd.Validate, postgresDB *gorm.DB) *AP
 //	@router			/newsletters [get]
 func (a *API) List(w http.ResponseWriter, r *http.Request) {
 
-	userId := r.Context().Value(validator.KeyID).(uint32)
+	userId := r.Context().Value(validator.UserKeyID).(uint32)
 
 	newsletters, err := a.repository.ListNewsletters(userId)
 	if err != nil {
@@ -81,8 +81,8 @@ func (a *API) List(w http.ResponseWriter, r *http.Request) {
 //	@router			/newsletters [post]
 func (a *API) Create(w http.ResponseWriter, r *http.Request) {
 
-	userId := r.Context().Value(validator.KeyID).(uint32)
-	newsletter := r.Context().Value("newsletter").(*newsletter.Newsletter)
+	userId := r.Context().Value(validator.UserKeyID).(uint32)
+	newsletter := r.Context().Value(validator.ResourceKeyID).(*newsletter.Newsletter)
 	newsletter.EditorId = userId
 
 	result, err := a.repository.CreateNewsletter(newsletter)
@@ -111,7 +111,7 @@ func (a *API) Create(w http.ResponseWriter, r *http.Request) {
 //	@router			/newsletters/{id} [get]
 func (a *API) Read(w http.ResponseWriter, r *http.Request) {
 
-	userId := r.Context().Value(validator.KeyID).(uint32)
+	userId := r.Context().Value(validator.UserKeyID).(uint32)
 
 	newsletterId, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
@@ -159,8 +159,8 @@ func (a *API) Read(w http.ResponseWriter, r *http.Request) {
 //	@router			/newsletters/{id} [put]
 func (a *API) Update(w http.ResponseWriter, r *http.Request) {
 
-	userId := r.Context().Value(validator.KeyID).(uint32)
-	newsletter := r.Context().Value("newsletter").(*newsletter.Newsletter)
+	userId := r.Context().Value(validator.UserKeyID).(uint32)
+	newsletter := r.Context().Value(validator.ResourceKeyID).(*newsletter.Newsletter)
 
 	newsletterId, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
@@ -201,7 +201,7 @@ func (a *API) Update(w http.ResponseWriter, r *http.Request) {
 //	@router			/newsletters/{id} [delete]
 func (a *API) Delete(w http.ResponseWriter, r *http.Request) {
 
-	userId := r.Context().Value(validator.KeyID).(uint32)
+	userId := r.Context().Value(validator.UserKeyID).(uint32)
 
 	newsletterId, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
