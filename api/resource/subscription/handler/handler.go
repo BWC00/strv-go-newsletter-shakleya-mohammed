@@ -56,6 +56,11 @@ func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
 
 	subscriptionID, err := a.repository.Subscribe(subscription)
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			a.logger.Error().Err(err).Msg("newsletter not found")
+			e.NotFoundErrors(w, e.ResourceNotFound)
+			return
+		}
 		a.logger.Error().Err(err).Msg("Unable to create subscription")
 		e.ServerError(w, e.DataCreationFailure)
 		return
@@ -81,7 +86,7 @@ func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
 		plainTextContent,
 		htmlContent,
 	); err != nil {
-		a.logger.Error().Err(err).Msg("Unable to send notification to email")
+		a.logger.Error().Err(err).Msg("Unable to send email subscription confirmation")
 		e.ServerError(w, e.SendingEmailFailure)
 	}
 
@@ -99,12 +104,20 @@ func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
 //	@param			id		path		string	true	"Subscription ID"
 //	@success		204
 //	@failure		404		{object}	err.Error
+//	@failure		500		{object}	err.Error
 //	@router			/subscriptions [delete]
 func (a *API) Unsubscribe(w http.ResponseWriter, r *http.Request) {
+
 	subscriptionID := r.URL.Query().Get("id")
+
 	if err := a.repository.Unsubscribe(subscriptionID); err != nil {
-		a.logger.Error().Err(err).Msg("already unsubscribed")
-		e.NotFoundErrors(w, e.ResourceNotFound)
+		if err.Error() == e.ResourceNotFound {
+			a.logger.Error().Err(err).Msg("subscription not found")
+			e.NotFoundErrors(w, e.ResourceNotFound)
+			return
+		}
+		a.logger.Error().Err(err).Msg("unable to unsubscribe")
+		e.ServerError(w, e.DataDeletionFailure)
 		return
 	}
 

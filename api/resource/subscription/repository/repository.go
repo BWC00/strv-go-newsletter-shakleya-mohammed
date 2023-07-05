@@ -2,12 +2,14 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"firebase.google.com/go/v4/db"
 	"gorm.io/gorm"
 
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/api/resource/subscription"
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/api/resource/newsletter"
+	e "github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/err"
 )
 
 type Repository struct {
@@ -25,7 +27,7 @@ func NewRepository(postgresDB *gorm.DB, firebaseDB *db.Ref) *Repository {
 
 func (r *Repository) Subscribe(SubscriptionInfo *subscription.Subscription) (string, error) {
 	//check if newsletter exists
-	if err := r.postgresDB.Where("id = ?", SubscriptionInfo.ID).First(&newsletter.Newsletter{}).Error; err != nil {
+	if err := r.postgresDB.Where("id = ?", SubscriptionInfo.NewsletterID).First(&newsletter.Newsletter{}).Error; err != nil {
 		return "", err
 	}
 
@@ -50,7 +52,7 @@ func (r *Repository) Unsubscribe(subscriptionID string) error {
 	// Check if there is a subscription
 	var subscription subscription.Subscription
 	if err := subscriptionRef.Get(context.Background(), &subscription); err != nil {
-		return err
+		return errors.New(e.ResourceNotFound)
 	}
 
 	// Remove subscription

@@ -7,6 +7,7 @@ import (
 
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/api/resource/user"
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/auth"
+	e "github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/err"
 )
 
 type Repository struct {
@@ -24,7 +25,7 @@ func (r *Repository) RegisterUser(userInfo *user.User) (string, error) {
 
 	// email must be unique
 	if err := r.postgresDB.Where("email = ?", userInfo.Email).First(&user.User{}).Error; err == nil {
-		return "", errors.New("email already exists")
+		return "", errors.New(e.FieldNotUnique)
 	}
 
 	hashedPassword, err := auth.Hash(userInfo.Password)

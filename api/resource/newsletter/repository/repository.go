@@ -58,6 +58,9 @@ func (r *Repository) UpdateNewsletter(newsletterInfo *newsletter.Newsletter) err
 }
 
 func (r *Repository) DeleteNewsletter(newsletterId uint32, userId uint32) error {
+	if _, err := r.ReadNewsletter(newsletterId, userId); err != nil {
+		return err
+	}
 	if err := r.postgresDB.Where("id = ? AND editor_id = ?", newsletterId, userId).Delete(&newsletter.Newsletter{}).Error; err != nil {
 		return err
 	}

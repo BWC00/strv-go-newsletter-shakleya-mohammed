@@ -18,13 +18,10 @@ func RegisterHTTPEndPoints(router *chi.Mux, l *logger.Logger, v *validator.Valid
 	middlewareHandlers := middleware.New(l, v)
 
 	router.Route("/subscriptions", func(r chi.Router) {
-		r.Use(middlewareHandlers.ContentTypeJson)
-
 		r.Method("DELETE", "/", requestlog.NewHandler(subscriptionAPI.Unsubscribe, l))
 
 		r.Group(func(r chi.Router) {
 			r.Use(middlewareHandlers.ValidateSubscription)
-
 			r.Method("POST", "/", requestlog.NewHandler(subscriptionAPI.Subscribe, l))
 		})
 	})

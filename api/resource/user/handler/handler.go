@@ -48,6 +48,10 @@ func (a *API) Register(w http.ResponseWriter, r *http.Request) {
 
 	token, err := a.repository.RegisterUser(user)
 	if err != nil {
+		if err.Error() == e.FieldNotUnique {
+			a.logger.Error().Err(err).Msg("email already taken")
+			e.BadRequest(w, e.FieldNotUnique)
+		}
 		a.logger.Error().Err(err).Msg("unable to register user")
 		e.ServerError(w, e.DataCreationFailure)
 		return
@@ -83,8 +87,12 @@ func (a *API) Login(w http.ResponseWriter, r *http.Request) {
 
 	token, err := a.repository.LoginUser(user)
 	if err != nil {
-		a.logger.Error().Err(err).Msg("user couldn't be authenticated")
-		e.ServerError(w, e.AuthenticationFailure)
+		if err == gorm.ErrRecordNotFound {
+			a.logger.Error().Err(err).Msg("email doesn't exist")
+			e.BadRequest(w, e.ResourceNotFound)
+		}
+		a.logger.Error().Err(err).Msg("password not correct")
+		e.BadRequest(w, e.AuthenticationFailure)
 		return
 	}
 

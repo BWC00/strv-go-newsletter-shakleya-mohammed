@@ -76,8 +76,6 @@ func (s *Server) setGlobalMiddleware() {
 	})
 	middlewareHandlers := middleware.New(s.logger, s.validator)
 	s.router.Use(middlewareHandlers.ContentTypeJson)
-	// s.router.Use(middleware.Json)
-	// s.router.Use(middleware.Recovery)
 }
 
 func (s *Server) newPostgresDB() {

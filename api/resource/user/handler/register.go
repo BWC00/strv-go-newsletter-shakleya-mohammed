@@ -15,7 +15,6 @@ func RegisterHTTPEndPoints(router *chi.Mux, l *logger.Logger, v *validator.Valid
 	middlewareHandlers := middleware.New(l, v)
 
 	router.Route("/users", func(r chi.Router) {
-		r.Use(middlewareHandlers.ContentTypeJson)
 		r.Use(middlewareHandlers.ValidateUser)
 
 		r.Method("POST", "/login", requestlog.NewHandler(userAPI.Login, l))

@@ -21,6 +21,7 @@ const (
 	SendingEmailFailure = "sending email failure"
 	AuthenticationFailure = "unthentication failure"
 	TokenExtractionFailure = "token extraction failure"
+	FieldNotUnique = "email not unique"
 
 )
 

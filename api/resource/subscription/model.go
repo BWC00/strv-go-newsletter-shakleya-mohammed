@@ -1,6 +1,6 @@
 package subscription
 
 type Subscription struct {
-	Email string `json:"email" form:"required,email"`
-	ID uint32 	 `json:"id,string" form:"required"`
+	Email string 		`json:"email" form:"required,email"`
+	NewsletterID uint32 `json:"newsletter_id,string" form:"required"`
 }
