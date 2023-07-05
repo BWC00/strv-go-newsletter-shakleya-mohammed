@@ -37,6 +37,41 @@ func New(logger *logger.Logger, validator *vd.Validate, postgresDB *gorm.DB, fir
 	}
 }
 
+// List godoc
+//
+//	@summary		List subscriptions
+//	@description	List subscriptions
+//	@tags			subscriptions
+//	@accept			json
+//	@produce		json
+//	@success		200
+//	@failure		400		{object}	err.Error
+//	@failure		422		{object}	err.Errors
+//	@failure		500		{object}	err.Error
+//	@router			/subscriptions [post]
+func (a *API) List(w http.ResponseWriter, r *http.Request) {
+
+	subscriptions, err := a.repository.ListSubscriptions()
+	if err != nil {
+		a.logger.Error().Err(err).Msg("unable to list subscriptions")
+		e.ServerError(w, e.DataAccessFailure)
+		return
+	}
+
+	if subscriptions == nil {
+		fmt.Fprint(w, "[]")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(subscriptions); err != nil {
+		a.logger.Error().Err(err).Msg("unable to encode subscription into response")
+		e.ServerError(w, e.JsonEncodingFailure)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
 // Subscribe godoc
 //
 //	@summary		Create subscription
@@ -58,7 +93,7 @@ func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			a.logger.Error().Err(err).Msg("newsletter not found")
-			e.NotFoundErrors(w, e.ResourceNotFound)
+			e.NotFoundError(w, e.ResourceNotFound)
 			return
 		}
 		a.logger.Error().Err(err).Msg("Unable to create subscription")

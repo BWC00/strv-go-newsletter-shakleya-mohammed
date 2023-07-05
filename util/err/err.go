@@ -23,6 +23,8 @@ const (
 	TokenExtractionFailure = "token extraction failure"
 	FieldNotUnique = "email not unique"
 
+	EndpointNotFound = "endpoint not found"
+
 )
 
 type Error struct {
@@ -53,7 +55,7 @@ func Unauthorized(w http.ResponseWriter, msg string) {
 	fmt.Fprintf(w, `{"error": "%v"}`, msg)
 }
 
-func NotFoundErrors(w http.ResponseWriter, msg string) {
+func NotFoundError(w http.ResponseWriter, msg string) {
 	w.WriteHeader(http.StatusNotFound)
 	fmt.Fprintf(w, `{"error": "%v"}`, msg)
 }

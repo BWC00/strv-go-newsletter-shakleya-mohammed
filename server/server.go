@@ -1,6 +1,7 @@
 package server
 
 import (
+	// Built-in
 	"context"
 	"fmt"
 	"net/http"
@@ -8,13 +9,16 @@ import (
 	"os/signal"
 	"syscall"
 
+	// Third party
 	"gorm.io/gorm"
 	"github.com/go-chi/chi/v5"
 	vd "github.com/go-playground/validator/v10"
 	"github.com/sendgrid/sendgrid-go"
 	"firebase.google.com/go/v4/db"
 
+	// User defined
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/config"
+	e "github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/err"
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/logger"
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/validator"
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/api/middleware"
@@ -25,15 +29,19 @@ import (
 
 )
 
+
+// SERVER ARCHITECTURE
+
 type Server struct {
-	cfg            *config.Config
-	postgresDB     *gorm.DB
-	firebaseDB     *db.Ref
-	sendGridClient *sendgrid.Client
- 	validator      *vd.Validate
-	logger         *logger.Logger
-	router         *chi.Mux
-	httpServer     *http.Server
+	cfg               *config.Config
+	postgresDB        *gorm.DB
+	firebaseDB        *db.Ref
+	sendGridClient    *sendgrid.Client
+ 	validator         *vd.Validate
+	logger            *logger.Logger
+	router            *chi.Mux
+	middlewareHandler *middleware.Middleware
+	httpServer        *http.Server
 }
 
 func New() *Server {
@@ -48,69 +56,20 @@ func New() *Server {
 func (s *Server) Init() {
 	s.newLogger()
 	s.newValidator()
-	s.newRouter()
-	s.setGlobalMiddleware()
+
 	s.newPostgresDB()
 	s.newFirebaseDB()
+
 	s.newSendGridClient()
+
+	s.newRouter()
+	s.newMiddleware()
+	s.setGlobalMiddleware()
 	s.registerHTTPEndPoints()
 }
 
-func (s *Server) newLogger() {
-	s.logger = logger.New(s.cfg.Server.Debug)
-}
 
-func (s *Server) newValidator() {
-	s.validator = validator.New()
-}
-
-func (s *Server) newRouter() {
-	s.router = chi.NewRouter()
-}
-
-func (s *Server) setGlobalMiddleware() {
-	s.router.NotFound(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNotFound)
-		_, _ = w.Write([]byte(`{"message": "endpoint not found"}`))
-	})
-	middlewareHandlers := middleware.New(s.logger, s.validator)
-	s.router.Use(middlewareHandlers.ContentTypeJson)
-}
-
-func (s *Server) newPostgresDB() {
-	var err error
-	if s.postgresDB, err = databases.NewPostgresDB(&s.cfg.DB.RDBMS, s.logger); err != nil {
-		s.logger.Fatal().Err(err).Msg("error initializing postgres database")
-	}
-}
-
-func (s *Server) newFirebaseDB() {
-	var err error
-	if s.firebaseDB, err = databases.NewFirebaseDB(&s.cfg.DB.Firebase); err != nil {
-		s.logger.Fatal().Err(err).Msg("error initializing firebase database")
-	}
-}
-
-func (s *Server) newSendGridClient() {
-	s.sendGridClient = sendgrid.NewSendClient(s.cfg.Email.SendGrid.ApiKey)
-}
-
-func (s *Server) registerHTTPEndPoints() {
-
-	s.router.Get("/live", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("."))
-	})
-
-	// s.router.Route("/api/v1", func(router chi.Router) {
-		subscriptionAPI.RegisterHTTPEndPoints(s.router, s.logger, s.validator, s.postgresDB, s.firebaseDB, s.sendGridClient, &s.cfg.Email)
-		newsletterAPI.RegisterHTTPEndPoints(s.router, s.logger, s.validator, s.postgresDB)
-		userAPI.RegisterHTTPEndPoints(s.router, s.logger, s.validator, s.postgresDB)
-	// })
-}
-
-
-//START SERVER
+//RUN SERVER
 
 func (s *Server) Run() {
 	s.httpServer = &http.Server{
@@ -134,6 +93,9 @@ func start(s *Server) {
 		s.logger.Fatal().Err(err).Msg("Server startup failure")
 	}
 }
+
+
+//SHUTDOWN SERVER
 
 func gracefulShutdown(s *Server) error {
 	sigint := make(chan os.Signal, 1)

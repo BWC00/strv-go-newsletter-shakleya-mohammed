@@ -124,7 +124,7 @@ func (a *API) Read(w http.ResponseWriter, r *http.Request) {
 	if err2 != nil {
 		if err2 == gorm.ErrRecordNotFound {
 			a.logger.Error().Err(err2).Msg("newsletter not found")
-			e.NotFoundErrors(w, e.ResourceNotFound)
+			e.NotFoundError(w, e.ResourceNotFound)
 			return
 		}
 
@@ -175,7 +175,7 @@ func (a *API) Update(w http.ResponseWriter, r *http.Request) {
 	if err := a.repository.UpdateNewsletter(newsletter); err != nil {
 		if err == gorm.ErrRecordNotFound {
 			a.logger.Error().Err(err).Msg("newsletter not found")
-			e.NotFoundErrors(w, e.ResourceNotFound)
+			e.NotFoundError(w, e.ResourceNotFound)
 			return
 		}
 		a.logger.Error().Err(err).Msg("unable to update newsletter")
@@ -213,7 +213,7 @@ func (a *API) Delete(w http.ResponseWriter, r *http.Request) {
 	if err := a.repository.DeleteNewsletter(uint32(newsletterId), userId); err != nil {
 		if err == gorm.ErrRecordNotFound {
 			a.logger.Error().Err(err).Msg("newsletter not found")
-			e.NotFoundErrors(w, e.ResourceNotFound)
+			e.NotFoundError(w, e.ResourceNotFound)
 			return
 		}
 		a.logger.Error().Err(err).Msg("unable to delete newsletter")

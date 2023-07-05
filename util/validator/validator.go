@@ -13,8 +13,10 @@ type key int
 
 const (
 	alphaZeroRegexString string = "^[a-zA-Z]*$"
+
 	UserKeyID key = iota
     ResourceKeyID key = iota
+    ApiVersionKeyID key = iota
 )
 
 type ErrResponse struct {

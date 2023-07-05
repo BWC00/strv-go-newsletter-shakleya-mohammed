@@ -23,6 +23,25 @@ func NewRepository(postgresDB *gorm.DB, firebaseDB *db.Ref) *Repository {
 }
 
 
+func (r *Repository) ListSubscriptions() (*[]subscription.Subscription, error) {
+	subscriptionsRef := r.firebaseDB.Child("subscriptions")
+
+	results, err := subscriptionsRef.OrderByKey().GetOrdered(context.Background())
+	if err != nil {
+	        return nil, err
+	}
+	subscriptions := make([]subscription.Subscription, len(results))
+	for i, r := range results {
+		var subscription subscription.Subscription
+		if err := r.Unmarshal(&subscription); err != nil {
+			return nil, err
+		}
+		subscriptions[i] = subscription
+	}
+
+	return &subscriptions, nil
+}
+
 func (r *Repository) Subscribe(SubscriptionInfo *subscription.Subscription) (string, error) {
 	//check if newsletter exists
 	if err := r.postgresDB.Where("id = ?", SubscriptionInfo.NewsletterID).First(&newsletter.Newsletter{}).Error; err != nil {
