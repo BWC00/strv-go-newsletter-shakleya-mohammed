@@ -18,15 +18,8 @@ import (
 
 	// User defined
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/config"
-	e "github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/err"
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/logger"
-	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/validator"
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/api/middleware"
-	databases "github.com/bwc00/strv-go-newsletter-shakleya-mohammed/database"
-	subscriptionAPI "github.com/bwc00/strv-go-newsletter-shakleya-mohammed/api/resource/subscription/handler"
-	newsletterAPI "github.com/bwc00/strv-go-newsletter-shakleya-mohammed/api/resource/newsletter/handler"
-	userAPI "github.com/bwc00/strv-go-newsletter-shakleya-mohammed/api/resource/user/handler"
-
 )
 
 

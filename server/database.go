@@ -1,3 +1,9 @@
+package server
+
+import (
+	databases "github.com/bwc00/strv-go-newsletter-shakleya-mohammed/database"
+)
+
 // DATABASE SERVICES
 
 func (s *Server) newPostgresDB() {

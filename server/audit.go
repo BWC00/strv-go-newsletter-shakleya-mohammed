@@ -1,3 +1,10 @@
+package server
+
+import (
+	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/logger"
+	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/validator"
+)
+
 // LOGGING AND VALIDATION
 
 func (s *Server) newLogger() {

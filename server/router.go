@@ -1,3 +1,18 @@
+package server
+
+import (
+	"net/http"
+	"fmt"
+
+	"github.com/go-chi/chi/v5"
+
+	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/api/middleware"
+	e "github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/err"
+	subscriptionAPI "github.com/bwc00/strv-go-newsletter-shakleya-mohammed/api/resource/subscription/handler"
+	newsletterAPI "github.com/bwc00/strv-go-newsletter-shakleya-mohammed/api/resource/newsletter/handler"
+	userAPI "github.com/bwc00/strv-go-newsletter-shakleya-mohammed/api/resource/user/handler"
+)
+
 // ROUTER AND MIDDLEWARE
 
 func (s *Server) newRouter() {

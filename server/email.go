@@ -1,3 +1,9 @@
+package server
+
+import (
+	"github.com/sendgrid/sendgrid-go"
+)
+
 // EMAIL SERVICE
 
 func (s *Server) newSendGridClient() {
