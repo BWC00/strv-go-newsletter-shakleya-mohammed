@@ -15,6 +15,10 @@ This repository contains the source code for a Go Newsletter platform API. The A
 - The usage of [Validator.v10](https://github.com/go-playground/validator) as the form validator.
 - The usage of GitHub actions to run tests and linters, generate OpenAPI specifications, and build and push production images to the Docker registry.
 
+## Start building
+
+Please study the .env file. It is one of the most crucial files required to properly set up the project. Please set the environment variables according to your own instance setup.
+
 ## Features
 
 - Sign up and sign in with email and password.
@@ -49,6 +53,7 @@ This repository contains the source code for a Go Newsletter platform API. The A
 
 ## Database design
 
+
 User:
 | Column Name    | Datatype  | Not Null | Primary Key |
 |----------------|-----------|----------|-------------|
@@ -69,6 +74,13 @@ Newsletter:
 | name           | VARCHAR   | X        |             |
 | description    | TEXT      |          |             |
 | created_at     | TIMESTAMP | X        |             |
+
+
+Subscription:
+| Column Name    | Datatype  | Not Null | Primary Key |
+|----------------|-----------|----------|-------------|
+| email          | string    |          |             |
+| newsletter_id  | INT       |          |             |
 
 ## Container image sizes
 
