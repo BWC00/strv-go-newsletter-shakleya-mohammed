@@ -38,7 +38,7 @@ func New(logger *logger.Logger, validator *vd.Validate, postgresDB *gorm.DB) *AP
 //	@tags			users
 //	@accept			json
 //	@produce		json
-//	@param			body	body	User	true	"User contents"
+//	@param			body	body	user.User	true	"User contents"
 //	@success		201
 //	@failure		400	{object}	err.Error
 //	@failure		422	{object}	err.Errors
@@ -86,7 +86,7 @@ func (a *API) Register(w http.ResponseWriter, r *http.Request) {
 //	@tags			users
 //	@accept			json
 //	@produce		json
-//	@param			body	body	User	true	"User contents"
+//	@param			body	body	user.User	true	"User contents"
 //	@success		200
 //	@failure		400	{object}	err.Error
 //	@failure		422	{object}	err.Errors

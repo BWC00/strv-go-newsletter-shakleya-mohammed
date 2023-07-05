@@ -87,7 +87,7 @@ func (a *API) List(w http.ResponseWriter, r *http.Request) {
 //	@tags			subscriptions
 //	@accept			json
 //	@produce		json
-//	@param			body	body		Subscription	true	"Subscription contents"
+//	@param			body	body		subscription.Subscription	true	"Subscription contents"
 //	@success		201
 //	@failure		400		{object}	err.Error
 //	@failure		422		{object}	err.Errors

@@ -40,7 +40,7 @@ func New(logger *logger.Logger, validator *vd.Validate, postgresDB *gorm.DB) *AP
 //	@tags			newsletters
 //	@accept			json
 //	@produce		json
-//	@success		200		{array}		Newsletter
+//	@success		200		{array}		newsletter.Newsletter
 //	@failure		500		{object}	err.Error
 //	@router			/newsletters [get]
 func (a *API) List(w http.ResponseWriter, r *http.Request) {
@@ -80,7 +80,7 @@ func (a *API) List(w http.ResponseWriter, r *http.Request) {
 //	@tags			newsletters
 //	@accept			json
 //	@produce		json
-//	@param			body	body		Newsletter	true	"Newsletter contents"
+//	@param			body	body		newsletter.Newsletter	true	"Newsletter contents"
 //	@success		201
 //	@failure		400		{object}	err.Error
 //	@failure		422		{object}	err.Errors
@@ -117,7 +117,7 @@ func (a *API) Create(w http.ResponseWriter, r *http.Request) {
 //	@accept			json
 //	@produce		json
 //	@param			id		path		string		true	"Newsletter ID"
-//	@success		200		{object}	Newsletter
+//	@success		200		{object}	newsletter.Newsletter
 //	@failure		400		{object}	err.Error
 //	@failure		404		{object}	err.Error
 //	@failure		500		{object}	err.Error
@@ -168,8 +168,8 @@ func (a *API) Read(w http.ResponseWriter, r *http.Request) {
 //	@tags			newsletters
 //	@accept			json
 //	@produce		json
-//	@param			id		path		string		true	"Newsletter ID"
-//	@param			body	body		Newsletter	true	"Updated newsletter contents"
+//	@param			id		path		string					true	"Newsletter ID"
+//	@param			body	body		newsletter.Newsletter	true	"Updated newsletter contents"
 //	@success		200
 //	@failure		400		{object}	err.Error
 //	@failure		404		{object}	err.Error
