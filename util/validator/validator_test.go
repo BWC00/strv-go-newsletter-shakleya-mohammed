@@ -35,9 +35,9 @@ var tests = []*testCase{
 		expected: "email must be a valid Email",
 	},
 	{
-		name: `alpha_space`,
+		name: `alpha_zero`,
 		input: struct {
-			Name string `json:"name" form:"alpha_space"`
+			Name string `json:"name" form:"alpha_zero"`
 		}{Name: "Some Name 2"},
 		expected: "name can only contain alphabetic and space characters",
 	},
