@@ -17,9 +17,10 @@ const (
 	FormErrResponseFailure = "form error response failure"
 	InvalidIdInUrlParam = "invalid id in url param"
 	UnauthorizedAccess = "unauthorized access"
-	ResourceNotFound = "resource record not found"
+	ResourceNotFound = "resource not found"
 	SendingEmailFailure = "sending email failure"
-	AuthenticationFailure = "uuthentication failure"
+	AuthenticationFailure = "unthentication failure"
+	TokenExtractionFailure = "token extraction failure"
 
 )
 

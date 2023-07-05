@@ -58,7 +58,7 @@ func (a *API) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewEncoder(w).Encode(newsletters); err != nil {
-		a.logger.Error().Err(err).Msg("")
+		a.logger.Error().Err(err).Msg("unable to encode newsletters into response")
 		e.ServerError(w, e.JsonEncodingFailure)
 		return
 	}
@@ -87,7 +87,7 @@ func (a *API) Create(w http.ResponseWriter, r *http.Request) {
 
 	result, err := a.repository.CreateNewsletter(newsletter)
 	if err != nil {
-		a.logger.Error().Err(err).Msg("")
+		a.logger.Error().Err(err).Msg("unable to create newsletter")
 		e.ServerError(w, e.DataCreationFailure)
 		return
 	}
@@ -122,18 +122,18 @@ func (a *API) Read(w http.ResponseWriter, r *http.Request) {
 	newsletter, err3 := a.repository.ReadNewsletter(uint32(newsletterId), userId)
 	if err3 != nil {
 		if err3 == gorm.ErrRecordNotFound {
-			a.logger.Error().Err(err3).Msg("")
+			a.logger.Error().Err(err3).Msg("newsletter not found")
 			e.NotFoundErrors(w, e.ResourceNotFound)
 			return
 		}
 
-		a.logger.Error().Err(err3).Msg("")
+		a.logger.Error().Err(err3).Msg("unable to access newsletter")
 		e.ServerError(w, e.DataAccessFailure)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(newsletter); err != nil {
-		a.logger.Error().Err(err).Msg("")
+		a.logger.Error().Err(err).Msg("unable to encode newsletter into response")
 		e.ServerError(w, e.JsonEncodingFailure)
 		return
 	}
@@ -163,7 +163,7 @@ func (a *API) Update(w http.ResponseWriter, r *http.Request) {
 
 	newsletterId, err2 := strconv.Atoi(chi.URLParam(r, "id"))
 	if err2 != nil {
-		a.logger.Error().Err(err2).Msg("")
+		a.logger.Error().Err(err2).Msg("invalid newsletter id in url param")
 		e.BadRequest(w, e.InvalidIdInUrlParam)
 		return
 	}
@@ -173,12 +173,12 @@ func (a *API) Update(w http.ResponseWriter, r *http.Request) {
 
 	if err := a.repository.UpdateNewsletter(newsletter); err != nil {
 		if err == gorm.ErrRecordNotFound {
-			a.logger.Error().Err(err).Msg("")
+			a.logger.Error().Err(err).Msg("newsletter not found")
 			e.NotFoundErrors(w, e.ResourceNotFound)
 			return
 		}
 
-		a.logger.Error().Err(err).Msg("")
+		a.logger.Error().Err(err).Msg("unable to access newsletter")
 		e.ServerError(w, e.DataUpdateFailure)
 		return
 	}
@@ -205,13 +205,13 @@ func (a *API) Delete(w http.ResponseWriter, r *http.Request) {
 
 	newsletterId, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
-		a.logger.Error().Err(err).Msg("")
+		a.logger.Error().Err(err).Msg("invalid newsletter id in url param")
 		e.BadRequest(w, e.InvalidIdInUrlParam)
 		return
 	}
 
 	if err := a.repository.DeleteNewsletter(uint32(newsletterId), userId); err != nil {
-		a.logger.Error().Err(err).Msg("")
+		a.logger.Error().Err(err).Msg("unable to delete newsletter")
 		e.ServerError(w, e.DataDeletionFailure)
 		return
 	}

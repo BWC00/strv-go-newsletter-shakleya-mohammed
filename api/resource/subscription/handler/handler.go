@@ -63,7 +63,7 @@ func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewEncoder(w).Encode(subscriptionID); err != nil {
-		a.logger.Error().Err(err).Msg("")
+		a.logger.Error().Err(err).Msg("unable to encode subscription id in response")
 		e.ServerError(w, e.JsonEncodingFailure)
 		return
 	}

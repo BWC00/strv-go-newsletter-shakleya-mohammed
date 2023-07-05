@@ -15,7 +15,7 @@ func (m *Middleware) ValidateNewsletter(next http.Handler) http.Handler {
 
 		newsletter := &newsletter.Newsletter{}
 		if err := json.NewDecoder(r.Body).Decode(newsletter); err != nil {
-			m.logger.Error().Err(err).Msg("")
+			m.logger.Error().Err(err).Msg("poorly formatted newsletter body")
 			e.BadRequest(w, e.JsonDecodingFailure)
 			return
 		}
@@ -23,13 +23,14 @@ func (m *Middleware) ValidateNewsletter(next http.Handler) http.Handler {
 		if err := m.validator.Struct(newsletter); err != nil {
 			resp := validator.ToErrResponse(err)
 			if resp == nil {
+				m.logger.Error().Err(err).Msg("form error response failure")
 				e.ServerError(w, e.FormErrResponseFailure)
 				return
 			}
 
 			respBody, err := json.Marshal(resp)
 			if err != nil {
-				m.logger.Error().Err(err).Msg("")
+				m.logger.Error().Err(err).Msg("json response encoding failure")
 				e.ServerError(w, e.JsonEncodingFailure)
 				return
 			}
