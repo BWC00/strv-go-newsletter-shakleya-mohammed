@@ -54,7 +54,7 @@ Please study the .env file. It is one of the most crucial files required to prop
 ## Database design
 
 
-User:
+User: (table, postgres)
 | Column Name    | Datatype  | Not Null | Primary Key |
 |----------------|-----------|----------|-------------|
 | id             | SERIAL    | X        | X           |
@@ -66,7 +66,7 @@ User:
 | created_at     | TIMESTAMP | X        |             |
 
 
-Newsletter:
+Newsletter: (table, postgres)
 | Column Name    | Datatype  | Not Null | Primary Key |
 |----------------|-----------|----------|-------------|
 | id             | SERIAL    | X        | X           |
@@ -76,11 +76,11 @@ Newsletter:
 | created_at     | TIMESTAMP | X        |             |
 
 
-Subscription:
-| Column Name    | Datatype  | Not Null | Primary Key |
-|----------------|-----------|----------|-------------|
-| email          | string    |          |             |
-| newsletter_id  | INT       |          |             |
+Subscription: (json, firebase)
+| Column Name    | Datatype  |
+|----------------|-----------|
+| email          | string    |
+| newsletter_id  | INT       |
 
 ## Container image sizes
 
