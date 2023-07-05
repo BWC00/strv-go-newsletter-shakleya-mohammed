@@ -4,6 +4,8 @@ import (
 	"time"
 )
 
+// USER MODEL
+
 type User struct {
 	ID    	  uint32    `json:"id"`
 	Firstname string    `json:"firstname" form:"alpha_zero,max=255"`

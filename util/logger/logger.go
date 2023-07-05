@@ -9,11 +9,14 @@ import (
 	"github.com/rs/zerolog"
 )
 
-// Custom logger.
+// Logger represents a custom logger.
 type Logger struct {
 	logger *zerolog.Logger
 }
 
+
+// New creates a new Logger instance with the specified log level.
+// If isDebug is true, the log level is set to TraceLevel; otherwise, it is set to InfoLevel.
 func New(isDebug bool) *Logger {
 	logLevel := zerolog.InfoLevel
 	if isDebug {
@@ -26,6 +29,8 @@ func New(isDebug bool) *Logger {
 	return &Logger{logger: &logger}
 }
 
+// NewConsole creates a new Logger instance with the specified log level and writes logs to the console (os.Stdout).
+// If isDebug is true, the log level is set to TraceLevel; otherwise, it is set to InfoLevel.
 func NewConsole(isDebug bool) *Logger {
 	logLevel := zerolog.InfoLevel
 	if isDebug {

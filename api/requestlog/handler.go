@@ -13,6 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // Source: https://github.com/google/go-cloud/blob/master/server/requestlog/requestlog.go
+
+
+// Package requestlog provides an HTTP handler for logging request information.
+// It logs details such as the request method, URL, headers, user agent, response status, latency, and more.
+// The logged information is sent to a logger instance.
 package requestlog
 
 import (
@@ -24,11 +29,13 @@ import (
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/logger"
 )
 
+// Handler is an HTTP handler that logs request information.
 type Handler struct {
 	handler http.Handler
 	logger  *logger.Logger
 }
 
+// NewHandler creates a new request log handler with the given HTTP handler and logger.
 func NewHandler(h http.HandlerFunc, l *logger.Logger) *Handler {
 	return &Handler{
 		handler: h,
@@ -36,9 +43,12 @@ func NewHandler(h http.HandlerFunc, l *logger.Logger) *Handler {
 	}
 }
 
+// ServeHTTP implements the http.Handler interface.
+// It logs request information such as method, URL, headers, user agent, response status, latency, and more.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 
+	// Create a log entry to store request details
 	le := &logEntry{
 		ReceivedTime:      start,
 		RequestMethod:     r.Method,
@@ -50,17 +60,22 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		RemoteIP:          ipFromHostPort(r.RemoteAddr),
 	}
 
+	// Retrieve the server IP address from the request context if available
 	if addr, ok := r.Context().Value(http.LocalAddrContextKey).(net.Addr); ok {
 		le.ServerIP = ipFromHostPort(addr.String())
 	}
+
+	// Create a new request and response writer to capture response information
 	r2 := new(http.Request)
 	*r2 = *r
 	rcc := &readCounterCloser{r: r.Body}
 	r2.Body = rcc
 	w2 := &responseStats{w: w}
 
+	// Call the underlying handler with the modified request and response writer
 	h.handler.ServeHTTP(w2, r2)
 
+	// Update the log entry with response details
 	le.Latency = time.Since(start)
 	if rcc.err == nil && rcc.r != nil {
 		// If the handler hasn't encountered an error in the Body (like EOF),
@@ -73,6 +88,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		le.Status = http.StatusOK
 	}
 	le.ResponseHeaderSize, le.ResponseBodySize = w2.size()
+
+	// Log the request information using the provided logger
 	h.logger.Info().
 		Time("received_time", le.ReceivedTime).
 		Str("method", le.RequestMethod).

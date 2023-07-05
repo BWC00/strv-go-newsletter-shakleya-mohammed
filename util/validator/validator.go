@@ -9,6 +9,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+// Custom key type.
 type key int
 
 const (
@@ -19,10 +20,13 @@ const (
     ApiVersionKeyID key = iota
 )
 
+// ErrResponse represents an error response containing a list of error messages.
 type ErrResponse struct {
 	Errors []string `json:"errors"`
 }
 
+// New creates a new validator instance using the go-playground validator library.
+// It registers custom validation tags and tag name functions.
 func New() *validator.Validate {
 	validate := validator.New()
 	validate.SetTagName("form")
@@ -41,6 +45,7 @@ func New() *validator.Validate {
 	return validate
 }
 
+// ToErrResponse converts a validation error to an ErrResponse containing formatted error messages.
 func ToErrResponse(err error) *ErrResponse {
 	if fieldErrors, ok := err.(validator.ValidationErrors); ok {
 		resp := ErrResponse{
@@ -68,6 +73,7 @@ func ToErrResponse(err error) *ErrResponse {
 	return nil
 }
 
+// isAlphaZero is a custom validation function that checks if a string contains only alphabetic characters.
 func isAlphaZero(fl validator.FieldLevel) bool {
 	reg := regexp.MustCompile(alphaZeroRegexString)
 	return reg.MatchString(fl.Field().String())

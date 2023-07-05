@@ -13,6 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // Source: https://github.com/google/go-cloud/blob/master/server/requestlog/requestlog.go
+
+
+// Package requestlog provides utility functions and types for logging HTTP request information.
 package requestlog
 
 import (
@@ -23,25 +26,27 @@ import (
 	"time"
 )
 
+// logEntry represents a log entry for an HTTP request.
 type logEntry struct {
-	ReceivedTime      time.Time
-	RequestMethod     string
-	RequestURL        string
-	RequestHeaderSize int64
-	RequestBodySize   int64
-	UserAgent         string
-	Referer           string
-	Proto             string
+	ReceivedTime      time.Time	// The time the request was received
+	RequestMethod     string	// The HTTP method of the request (e.g., GET, POST)
+	RequestURL        string	// The URL of the request
+	RequestHeaderSize int64		// The size of the request headers
+	RequestBodySize   int64		// The size of the request body
+	UserAgent         string	// The user agent of the client
+	Referer           string	// The referer URL of the client
+	Proto             string	// The protocol version of the request
 
-	RemoteIP string
-	ServerIP string
+	RemoteIP string	// The IP address of the client
+	ServerIP string	// The IP address of the server
 
-	Status             int
-	ResponseHeaderSize int64
-	ResponseBodySize   int64
-	Latency            time.Duration
+	Status             int			 // The HTTP response status code
+	ResponseHeaderSize int64		 // The size of the response headers
+	ResponseBodySize   int64		 // The size of the response body
+	Latency            time.Duration // The duration of the request processing
 }
 
+// ipFromHostPort extracts the IP address from a host:port string.
 func ipFromHostPort(hp string) string {
 	h, _, err := net.SplitHostPort(hp)
 	if err != nil {
@@ -53,12 +58,14 @@ func ipFromHostPort(hp string) string {
 	return h
 }
 
+// readCounterCloser is a wrapper around an io.ReadCloser that keeps track of the number of bytes read.
 type readCounterCloser struct {
 	r   io.ReadCloser
 	n   int64
 	err error
 }
 
+// Read reads bytes from the underlying reader and updates the byte count.
 func (rcc *readCounterCloser) Read(p []byte) (n int, err error) {
 	if rcc.err != nil {
 		return 0, rcc.err
@@ -68,35 +75,42 @@ func (rcc *readCounterCloser) Read(p []byte) (n int, err error) {
 	return n, rcc.err
 }
 
+// Close closes the underlying reader and returns an error indicating that the reader is closed.
 func (rcc *readCounterCloser) Close() error {
 	rcc.err = errors.New("read from closed reader")
 	return rcc.r.Close()
 }
 
+// writeCounter is an integer type that implements the io.Writer interface.
 type writeCounter int64
 
+// Write increments the write counter by the number of bytes written.
 func (wc *writeCounter) Write(p []byte) (n int, err error) {
 	*wc += writeCounter(len(p))
 	return len(p), nil
 }
 
+// headerSize calculates the size of the headers in bytes.
 func headerSize(h http.Header) int64 {
 	var wc writeCounter
 	h.Write(&wc)
-	return int64(wc) + 2 // for CRLF
+	return int64(wc) + 2 // Add 2 bytes for CRLF (carriage return, line feed)
 }
 
+// responseStats is a wrapper around an http.ResponseWriter that captures response information.
 type responseStats struct {
-	w     http.ResponseWriter
-	hsize int64
-	wc    writeCounter
-	code  int
+	w     http.ResponseWriter // The underlying ResponseWriter
+	hsize int64				  // The size of the response headers
+	wc    writeCounter		  // The write counter for the response body
+	code  int				  // The HTTP response status code
 }
 
+// Header returns the header map of the underlying ResponseWriter.
 func (r *responseStats) Header() http.Header {
 	return r.w.Header()
 }
 
+// WriteHeader writes the HTTP response status code and captures the header size.
 func (r *responseStats) WriteHeader(statusCode int) {
 	if r.code != 0 {
 		return
@@ -106,6 +120,7 @@ func (r *responseStats) WriteHeader(statusCode int) {
 	r.code = statusCode
 }
 
+// Write writes the response body and updates the write counter.
 func (r *responseStats) Write(p []byte) (n int, err error) {
 	if r.code == 0 {
 		r.WriteHeader(http.StatusOK)
@@ -115,6 +130,7 @@ func (r *responseStats) Write(p []byte) (n int, err error) {
 	return
 }
 
+// size returns the header size and response body size.
 func (r *responseStats) size() (hdr, body int64) {
 	if r.code == 0 {
 		return headerSize(r.w.Header()), 0

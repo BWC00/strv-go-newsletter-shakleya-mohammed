@@ -15,18 +15,25 @@ import (
 
 // ROUTER AND MIDDLEWARE
 
+// newRouter initializes a new chi Router for routing HTTP requests.
 func (s *Server) newRouter() {
 	s.router = chi.NewRouter()
 }
 
+// newMiddleware initializes a new middleware handler.
+// It creates a new instance of the middleware handler using the server's logger and validator.
 func (s *Server) newMiddleware() {
 	s.middlewareHandler = middleware.New(s.logger, s.validator)
 }
 
+// setGlobalMiddleware adds global middleware to the router.
+// It sets the content type to JSON for all requests handled by the router.
 func (s *Server) setGlobalMiddleware() {
 	s.router.Use(s.middlewareHandler.ContentTypeJson)
 }
 
+// registerHTTPEndPoints registers the HTTP endpoints for the server.
+// It defines the routing logic for the server's API endpoints.
 func (s *Server) registerHTTPEndPoints() {
 	// Live route
 	s.router.Get("/live", func(w http.ResponseWriter, r *http.Request) {

@@ -19,6 +19,7 @@ import (
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/config"
 )
 
+// API represents the handler for the subscription API endpoints.
 type API struct {
 	logger         *logger.Logger
 	validator      *vd.Validate
@@ -27,6 +28,7 @@ type API struct {
 	cfg		   	   *config.EmailConfig
 }
 
+// New creates a new instance of the API handler.
 func New(logger *logger.Logger, validator *vd.Validate, postgresDB *gorm.DB, firebaseDB *db.Ref, sendGridClient *sendgrid.Client, cfg *config.EmailConfig) *API {
 	return &API{
 		logger:     	logger,
@@ -50,7 +52,7 @@ func New(logger *logger.Logger, validator *vd.Validate, postgresDB *gorm.DB, fir
 //	@failure		500		{object}	err.Error
 //	@router			/subscriptions [post]
 func (a *API) List(w http.ResponseWriter, r *http.Request) {
-
+	// Retrieve list of subscriptions
 	subscriptions, err := a.repository.ListSubscriptions()
 	if err != nil {
 		a.logger.Error().Err(err).Msg("unable to list subscriptions")
@@ -58,17 +60,23 @@ func (a *API) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Handle empty subscriptions case
 	if subscriptions == nil {
 		fmt.Fprint(w, "[]")
+
+		// Return 200 OK status
 		w.WriteHeader(http.StatusOK)
 		return
 	}
 
+	// Encode subscriptions into response
 	if err := json.NewEncoder(w).Encode(subscriptions); err != nil {
 		a.logger.Error().Err(err).Msg("unable to encode subscription into response")
 		e.ServerError(w, e.JsonEncodingFailure)
 		return
 	}
+
+	// Return 200 OK status
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -86,31 +94,38 @@ func (a *API) List(w http.ResponseWriter, r *http.Request) {
 //	@failure		500		{object}	err.Error
 //	@router			/subscriptions [post]
 func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
-	
+	// Extract subscription from the request context
 	subscription := r.Context().Value(validator.ResourceKeyID).(*subscription.Subscription)
 
+	// Create a new subscription
 	subscriptionID, err := a.repository.Subscribe(subscription)
 	if err != nil {
+		// Check if the newsletter is not found
 		if err == gorm.ErrRecordNotFound {
 			a.logger.Error().Err(err).Msg("newsletter not found")
 			e.NotFoundError(w, e.ResourceNotFound)
 			return
 		}
+
+		// Handle other errors during subscription creation
 		a.logger.Error().Err(err).Msg("Unable to create subscription")
 		e.ServerError(w, e.DataCreationFailure)
 		return
 	}
 
+	// Encode subscription ID into the response
 	if err := json.NewEncoder(w).Encode(subscriptionID); err != nil {
 		a.logger.Error().Err(err).Msg("unable to encode subscription id in response")
 		e.ServerError(w, e.JsonEncodingFailure)
 		return
 	}
 
+	// Prepare email subscription confirmation
 	subject := "Subscribed to newsletter!"
 	plainTextContent := "Subscribed to newsletter!"
 	htmlContent := fmt.Sprintf("Subscribed! link to unsubscribe: <a href='http://localhost:8080/subscriptions?id=%s'>unsubscribeYou</a>", subscriptionID)
 
+	// Send email
 	if err := email.Send(
 		a.sendGridClient,
 		a.cfg.SendGrid.SendFromName,
@@ -121,12 +136,16 @@ func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
 		plainTextContent,
 		htmlContent,
 	); err != nil {
+		// Handle error if sending email fails
 		a.logger.Error().Err(err).Msg("Unable to send email subscription confirmation")
 		e.ServerError(w, e.SendingEmailFailure)
 		return
 	}
 
+	// Log successful subscription
 	a.logger.Info().Str("email", subscription.Email).Msg("subscribed to newsletter")
+
+	// Return 201 Created status
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -142,14 +161,19 @@ func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
 //	@failure		500		{object}	err.Error
 //	@router			/subscriptions [delete]
 func (a *API) Unsubscribe(w http.ResponseWriter, r *http.Request) {
-
+	// Retrieve the subscription ID from the query parameter
 	subscriptionID := r.URL.Query().Get("id")
 
+	// Delete the subscription
 	if err := a.repository.Unsubscribe(subscriptionID); err != nil {
 		a.logger.Error().Err(err).Msg("unable to delete subscription")
 		e.ServerError(w, e.DataDeletionFailure)
 		return
 	}
 
+	// Log successful unsubscription
 	a.logger.Info().Msg("unsubscribed to newsletter")
+
+	// Return 204 No Content status
+	w.WriteHeader(http.StatusNoContent)
 }

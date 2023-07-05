@@ -6,12 +6,14 @@ import (
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/validator"
 )
 
+// testCase represents a test case for the validator.
 type testCase struct {
 	name     string
 	input    interface{}
 	expected string
 }
 
+// tests contains a list of test cases to be executed.
 var tests = []*testCase{
 	{
 		name: `required`,
@@ -43,14 +45,20 @@ var tests = []*testCase{
 	},
 }
 
+// TestToErrResponse tests the conversion of validation errors to error response.
 func TestToErrResponse(t *testing.T) {
 	vr := validator.New()
 
+	// Iterate over each test case
 	for _, tc := range tests {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
+
+			// Validate the input data
 			err := vr.Struct(tc.input)
+
+			// Convert validation errors to error response and check the error response
 			if errResp := validator.ToErrResponse(err); errResp == nil || len(errResp.Errors) != 1 {
 				t.Fatalf(`Expected:"{[%v]}", Got:"%v"`, tc.expected, errResp)
 			} else if errResp.Errors[0] != tc.expected {

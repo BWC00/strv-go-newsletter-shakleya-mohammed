@@ -4,6 +4,8 @@ import (
 	"time"
 )
 
+// NEWSLETTER MODEL
+
 type Newsletter struct {
 	ID  		  uint32    `json:"id"`
 	EditorId      uint32    `json:"editor_id"`
