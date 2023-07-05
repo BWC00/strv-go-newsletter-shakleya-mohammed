@@ -3,10 +3,8 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-	"strings"
 	"fmt"
 
-	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	vd "github.com/go-playground/validator/v10"
 	"github.com/sendgrid/sendgrid-go"
 	"firebase.google.com/go/v4/db"
@@ -16,6 +14,7 @@ import (
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/api/resource/subscription"
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/validator"
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/logger"
+	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/email"
 	e "github.com/bwc00/strv-go-newsletter-shakleya-mohammed/util/err"
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/config"
 )
@@ -68,20 +67,21 @@ func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	at := strings.LastIndex(subscription.Email, "@")
-	username := subscription.Email[:at]
-
-	// Initialise the required mail message variables
-	from := mail.NewEmail(a.cfg.SendGrid.SendFromName, a.cfg.SendGrid.SendFromAddress)
 	subject := "Subscribed to newsletter!"
-	to := mail.NewEmail(username, subscription.Email)
 	plainTextContent := "Subscribed to newsletter!"
 	htmlContent := fmt.Sprintf("Subscribed! link to unsubscribe: <a href='http://localhost:8080/api/v1/unsubscribe?subscriptionid=%s'>unsubscribeYou</a>", subscriptionID)
-	message := mail.NewSingleEmail(from, subject, to, plainTextContent, htmlContent)
 
-	response, err := a.sendGridClient.Send(message)
-	if err != nil && !(response.StatusCode == 200 || response.StatusCode == 201 || response.StatusCode == 202) {
-		a.logger.Error().Err(err).Msg("Unable to send notification to your email")
+	if err := email.Send(
+		a.sendGridClient,
+		a.cfg.SendGrid.SendFromName,
+		a.cfg.SendGrid.SendFromAddress,
+		subject,
+		email.ExtractEmailUsername(subscription.Email),
+		subscription.Email,
+		plainTextContent,
+		htmlContent,
+	); err != nil {
+		a.logger.Error().Err(err).Msg("Unable to send notification to email")
 		e.ServerError(w, e.SendingEmailFailure)
 	}
 
