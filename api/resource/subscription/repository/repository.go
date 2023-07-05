@@ -54,7 +54,7 @@ func (r *Repository) Unsubscribe(subscriptionID string) error {
 	}
 
 	// Remove subscription
-	err := subscriptionsRef.Set(context.Background(), nil)
+	err := subscriptionRef.Set(context.Background(), nil)
 
 	return err
 }

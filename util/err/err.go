@@ -15,12 +15,12 @@ const (
 	JsonDecodingFailure = "json decoding failure"
 
 	FormErrResponseFailure = "form error response failure"
-
 	InvalidIdInUrlParam = "invalid id in url param"
+	UnauthorizedAccess = "unauthorized access"
+	ResourceNotFound = "resource record not found"
+	SendingEmailFailure = "sending email failure"
+	AuthenticationFailure = "uuthentication failure"
 
-	UnauthorizedAccess = "Unauthorized access"
-
-	ResourceNotFound = "Resource record not found"
 )
 
 type Error struct {
