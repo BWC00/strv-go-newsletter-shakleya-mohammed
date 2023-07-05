@@ -19,7 +19,7 @@ const (
 	UnauthorizedAccess = "unauthorized access"
 	ResourceNotFound = "resource not found"
 	SendingEmailFailure = "sending email failure"
-	AuthenticationFailure = "unthentication failure"
+	AuthenticationFailure = "authentication failure"
 	TokenExtractionFailure = "token extraction failure"
 	FieldNotUnique = "email not unique"
 

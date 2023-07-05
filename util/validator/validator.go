@@ -9,14 +9,12 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-const (
-	alphaSpaceRegexString string = "^[a-zA-Z ]+$"
-)
-
 type key int
 
 const (
-    KeyID key = iota
+	alphaZeroRegexString string = "^[a-zA-Z]*$"
+	UserKeyID key = iota
+    ResourceKeyID key = iota
 )
 
 type ErrResponse struct {
@@ -36,7 +34,7 @@ func New() *validator.Validate {
 		return name
 	})
 
-	validate.RegisterValidation("alpha_space", isAlphaSpace)
+	validate.RegisterValidation("alpha_zero", isAlphaZero)
 
 	return validate
 }
@@ -55,7 +53,7 @@ func ToErrResponse(err error) *ErrResponse {
 				resp.Errors[i] = fmt.Sprintf("%s must be a maximum of %s in length", err.Field(), err.Param())
 			case "email":
 				resp.Errors[i] = fmt.Sprintf("%s must be a valid Email", err.Field())
-			case "alpha_space":
+			case "alpha_zero":
 				resp.Errors[i] = fmt.Sprintf("%s can only contain alphabetic and space characters", err.Field())
 			default:
 				resp.Errors[i] = fmt.Sprintf("something wrong on %s; %s", err.Field(), err.Tag())
@@ -68,7 +66,7 @@ func ToErrResponse(err error) *ErrResponse {
 	return nil
 }
 
-func isAlphaSpace(fl validator.FieldLevel) bool {
-	reg := regexp.MustCompile(alphaSpaceRegexString)
+func isAlphaZero(fl validator.FieldLevel) bool {
+	reg := regexp.MustCompile(alphaZeroRegexString)
 	return reg.MatchString(fl.Field().String())
 }
