@@ -29,12 +29,15 @@ This repository contains the source code for a Go Newsletter platform API. The A
 |--------------------|-------------|---------------------------|
 | Health             | GET         | /live                     |
 |                    |             |                           |
+|                    |             |                           |
 | Login user         | POST        | /api/v1/users/login       |
 | Register user      | POST        | /api/v1/users/register    |
+|                    |             |                           |
 |                    |             |                           |
 | Subscribe          | POST        | /api/v1/subscriptions     |
 | Unsubscribe        | GET         | /api/v1/subscriptions     |
 | List Subscriptions | GET         | /api/v1/subscriptions/all |
+|                    |             |                           |
 |                    |             |                           |
 | List Newsletters   | GET         | /api/v1/newsletters       |
 | Create Newsletter  | POST        | /api/v1/newsletters       |
@@ -44,7 +47,7 @@ This repository contains the source code for a Go Newsletter platform API. The A
 
 💡 [swaggo/swag](https://github.com/swaggo/swag) : `swag init -g cmd/api/main.go -o .swagger -ot yaml`
 
-## 🗄️ Database design
+## Database design
 
 User:
 | Column Name    | Datatype  | Not Null | Primary Key |
@@ -56,6 +59,7 @@ User:
 | password       | VARCHAR   | X        |             |
 | description    | TEXT      |          |             |
 | created_at     | TIMESTAMP | X        |             |
+
 
 Newsletter:
 | Column Name    | Datatype  | Not Null | Primary Key |
@@ -73,7 +77,7 @@ Newsletter:
     - Development environment: 655MB
     - Production environment: 28MB ; 💡`docker build -f prod.Dockerfile . -t app`
 
-## 📁 Project structure
+## Project structure
 
 ```shell
 strv-go-newsletter-shakleya-mohammed
