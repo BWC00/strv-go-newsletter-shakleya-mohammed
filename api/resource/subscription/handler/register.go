@@ -20,12 +20,12 @@ func RegisterHTTPEndPoints(router *chi.Mux, l *logger.Logger, v *validator.Valid
 	router.Route("/subscriptions", func(r chi.Router) {
 		r.Use(middlewareHandlers.ContentTypeJson)
 
-		r.Method("GET", "/unsubscribe", requestlog.NewHandler(subscriptionAPI.Unsubscribe, l))
+		r.Method("DELETE", "/", requestlog.NewHandler(subscriptionAPI.Unsubscribe, l))
 
 		r.Group(func(r chi.Router) {
 			r.Use(middlewareHandlers.ValidateSubscription)
 
-			r.Method("POST", "/subscribe", requestlog.NewHandler(subscriptionAPI.Subscribe, l))
+			r.Method("POST", "/", requestlog.NewHandler(subscriptionAPI.Subscribe, l))
 		})
 	})
 }

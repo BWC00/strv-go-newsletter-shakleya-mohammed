@@ -15,7 +15,7 @@ func RegisterHTTPEndPoints(router *chi.Mux, l *logger.Logger, v *validator.Valid
 	middlewareHandlers := middleware.New(l, v)
 
 	router.Route("/newsletters", func(r chi.Router) {
-		r.Use(middlewareHandlers.ContentTypeJson)
+		// Protected routes
 		r.Use(middlewareHandlers.Authentication)
 
 		r.Method("GET", "/", requestlog.NewHandler(newsletterAPI.List, l))
@@ -23,6 +23,7 @@ func RegisterHTTPEndPoints(router *chi.Mux, l *logger.Logger, v *validator.Valid
 		r.Method("DELETE", "/{id}", requestlog.NewHandler(newsletterAPI.Delete, l))
 
 		r.Group(func(r chi.Router) {
+			// Routes require validation
 			r.Use(middlewareHandlers.ValidateNewsletter)
 
 			r.Method("POST", "/", requestlog.NewHandler(newsletterAPI.Create, l))

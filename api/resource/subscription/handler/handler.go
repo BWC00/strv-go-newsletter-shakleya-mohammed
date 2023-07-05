@@ -45,19 +45,19 @@ func New(logger *logger.Logger, validator *vd.Validate, postgresDB *gorm.DB, fir
 //	@tags			subscriptions
 //	@accept			json
 //	@produce		json
-//	@param			Subscription
+//	@param			body	body		Subscription	true	"Subscription contents"
 //	@success		201
-//	@failure		400	{object}	err.Error
-//	@failure		422	{object}	err.Errors
-//	@failure		500	{object}	err.Error
-//	@router			/subscribe [post]
+//	@failure		400		{object}	err.Error
+//	@failure		422		{object}	err.Errors
+//	@failure		500		{object}	err.Error
+//	@router			/subscriptions [post]
 func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
 	
 	subscription := r.Context().Value(validator.KeyID).(*subscription.Subscription)
 
 	subscriptionID, err := a.repository.Subscribe(subscription)
 	if err != nil {
-		a.logger.Error().Err(err).Msg("")
+		a.logger.Error().Err(err).Msg("Unable to create subscription")
 		e.ServerError(w, e.DataCreationFailure)
 		return
 	}
@@ -81,8 +81,8 @@ func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
 
 	response, err := a.sendGridClient.Send(message)
 	if err != nil && !(response.StatusCode == 200 || response.StatusCode == 201 || response.StatusCode == 202) {
-		a.logger.Error().Err(err).Msg("Unable to send your email")
-		e.ServerError(w, e.JsonEncodingFailure)
+		a.logger.Error().Err(err).Msg("Unable to send notification to your email")
+		e.ServerError(w, e.SendingEmailFailure)
 	}
 
 	a.logger.Info().Str("email", subscription.Email).Msg("subscribed to newsletter")
@@ -96,17 +96,15 @@ func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
 //	@tags			subscriptions
 //	@accept			json
 //	@produce		json
-//	@param			id
+//	@param			id		path		string	true	"Subscription ID"
 //	@success		204
-//	@failure		400	{object}	err.Error
-//	@failure		422	{object}	err.Errors
-//	@failure		500	{object}	err.Error
-//	@router			/unsubscribe [post]
+//	@failure		404		{object}	err.Error
+//	@router			/subscriptions [delete]
 func (a *API) Unsubscribe(w http.ResponseWriter, r *http.Request) {
-	subscriptionID := r.URL.Query().Get("subscriptionid")
+	subscriptionID := r.URL.Query().Get("id")
 	if err := a.repository.Unsubscribe(subscriptionID); err != nil {
-		a.logger.Error().Err(err).Msg("")
-		e.ServerError(w, e.DataCreationFailure)
+		a.logger.Error().Err(err).Msg("already unsubscribed")
+		e.NotFoundErrors(w, e.ResourceNotFound)
 		return
 	}
 

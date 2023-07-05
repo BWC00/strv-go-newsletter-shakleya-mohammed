@@ -36,7 +36,7 @@ func New(logger *logger.Logger, validator *vd.Validate, postgresDB *gorm.DB) *AP
 //	@tags			users
 //	@accept			json
 //	@produce		json
-//	@param			firstname    lastname    email    password	
+//	@param			body	body	User	true	"User contents"
 //	@success		201
 //	@failure		400	{object}	err.Error
 //	@failure		422	{object}	err.Errors
@@ -48,13 +48,13 @@ func (a *API) Register(w http.ResponseWriter, r *http.Request) {
 
 	token, err := a.repository.RegisterUser(user)
 	if err != nil {
-		a.logger.Error().Err(err).Msg("")
+		a.logger.Error().Err(err).Msg("unable to register user")
 		e.ServerError(w, e.DataCreationFailure)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(token); err != nil {
-		a.logger.Error().Err(err).Msg("")
+		a.logger.Error().Err(err).Msg("unable to encode token in response")
 		e.ServerError(w, e.JsonEncodingFailure)
 		return
 	}
@@ -71,8 +71,8 @@ func (a *API) Register(w http.ResponseWriter, r *http.Request) {
 //	@tags			users
 //	@accept			json
 //	@produce		json
-//	@param			email	 password
-//	@success		201
+//	@param			body	body	User	true	"User contents"
+//	@success		200
 //	@failure		400	{object}	err.Error
 //	@failure		422	{object}	err.Errors
 //	@failure		500	{object}	err.Error
@@ -83,13 +83,13 @@ func (a *API) Login(w http.ResponseWriter, r *http.Request) {
 
 	token, err := a.repository.LoginUser(user)
 	if err != nil {
-		a.logger.Error().Err(err).Msg("")
-		e.ServerError(w, e.DataCreationFailure)
+		a.logger.Error().Err(err).Msg("user couldn't be authenticated")
+		e.ServerError(w, e.AuthenticationFailure)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(token); err != nil {
-		a.logger.Error().Err(err).Msg("")
+		a.logger.Error().Err(err).Msg("unable to encode token in response")
 		e.ServerError(w, e.JsonEncodingFailure)
 		return
 	}

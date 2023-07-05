@@ -25,18 +25,13 @@ func NewRepository(postgresDB *gorm.DB, firebaseDB *db.Ref) *Repository {
 
 func (r *Repository) Subscribe(SubscriptionInfo *subscription.Subscription) (string, error) {
 	//check if newsletter exists
-	if err := r.postgresDB.Where("id = ?", SubscriptionInfo.NewsletterID).First(&newsletter.Newsletter{}).Error; err != nil {
+	if err := r.postgresDB.Where("id = ?", SubscriptionInfo.ID).First(&newsletter.Newsletter{}).Error; err != nil {
 		return "", err
 	}
 
 	subscriptionsRef := r.firebaseDB.Child("subscriptions")
 
-	//check if already subscribed (this is a blocking operation)
-	// if err := subscriptionsRef.Get(context.Background(), &subscription.Subscription{}); err == nil {
-	//         log.Fatalln("Error reading value:", err)
-	// }
-
-	// As an admin, the app has access to read and write all data, regradless of Security Rules
+	// Add subscription
 	newSubscriptionRef, err := subscriptionsRef.Push(context.Background(), SubscriptionInfo)
 	if err != nil {
 		return "", err
@@ -50,7 +45,13 @@ func (r *Repository) Subscribe(SubscriptionInfo *subscription.Subscription) (str
 
 func (r *Repository) Unsubscribe(subscriptionID string) error {
 
-	subscriptionsRef := r.firebaseDB.Child("subscriptions").Child(subscriptionID)
+	subscriptionRef := r.firebaseDB.Child("subscriptions").Child(subscriptionID)
+
+	// Check if there is a subscription
+	var subscription subscription.Subscription
+	if err := subscriptionRef.Get(context.Background(), &subscription); err != nil {
+		return err
+	}
 
 	// Remove subscription
 	err := subscriptionsRef.Set(context.Background(), nil)

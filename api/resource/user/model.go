@@ -5,7 +5,7 @@ import (
 )
 
 type User struct {
-	ID    	  uint32    `json:"user_id"`
+	ID    	  uint32    `json:"id"`
 	Firstname string    `json:"firstname" form:"alpha_space,max=255"`
 	Lastname  string    `json:"lastname" form:"alpha_space,max=255"`
 	Email     string    `json:"email" form:"required,email,max=255"`

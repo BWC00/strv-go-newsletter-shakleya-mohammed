@@ -38,8 +38,8 @@ func New(logger *logger.Logger, validator *vd.Validate, postgresDB *gorm.DB) *AP
 //	@tags			newsletters
 //	@accept			json
 //	@produce		json
-//	@success		200	{array}		Newsletter
-//	@failure		500	{object}	err.Error
+//	@success		200		{array}		Newsletter
+//	@failure		500		{object}	err.Error
 //	@router			/newsletters [get]
 func (a *API) List(w http.ResponseWriter, r *http.Request) {
 
@@ -47,7 +47,7 @@ func (a *API) List(w http.ResponseWriter, r *http.Request) {
 
 	newsletters, err := a.repository.ListNewsletters(userId)
 	if err != nil {
-		a.logger.Error().Err(err).Msg("")
+		a.logger.Error().Err(err).Msg("unable to list newsletters")
 		e.ServerError(w, e.DataAccessFailure)
 		return
 	}
@@ -73,11 +73,11 @@ func (a *API) List(w http.ResponseWriter, r *http.Request) {
 //	@tags			newsletters
 //	@accept			json
 //	@produce		json
-//	@param			name    description
+//	@param			body	body		Newsletter	true	"Newsletter contents"
 //	@success		201
-//	@failure		400	{object}	err.Error
-//	@failure		422	{object}	err.Errors
-//	@failure		500	{object}	err.Error
+//	@failure		400		{object}	err.Error
+//	@failure		422		{object}	err.Errors
+//	@failure		500		{object}	err.Error
 //	@router			/newsletters [post]
 func (a *API) Create(w http.ResponseWriter, r *http.Request) {
 
@@ -103,11 +103,11 @@ func (a *API) Create(w http.ResponseWriter, r *http.Request) {
 //	@tags			newsletters
 //	@accept			json
 //	@produce		json
-//	@param			id
-//	@success		200	{object}	Newsletter
-//	@failure		400	{object}	err.Error
-//	@failure		404
-//	@failure		500	{object}	err.Error
+//	@param			id		path		string		true	"Newsletter ID"
+//	@success		200		{object}	Newsletter
+//	@failure		400		{object}	err.Error
+//	@failure		404		{object}	err.Error
+//	@failure		500		{object}	err.Error
 //	@router			/newsletters/{id} [get]
 func (a *API) Read(w http.ResponseWriter, r *http.Request) {
 
@@ -148,12 +148,13 @@ func (a *API) Read(w http.ResponseWriter, r *http.Request) {
 //	@tags			newsletters
 //	@accept			json
 //	@produce		json
-//	@param			id		name	description
+//	@param			id		path		string		true	"Newsletter ID"
+//	@param			body	body		Newsletter	true	"Updated newsletter contents"
 //	@success		200
-//	@failure		400	{object}	err.Error
-//	@failure		404
-//	@failure		422	{object}	err.Errors
-//	@failure		500	{object}	err.Error
+//	@failure		400		{object}	err.Error
+//	@failure		404		{object}	err.Error
+//	@failure		422		{object}	err.Errors
+//	@failure		500		{object}	err.Error
 //	@router			/newsletters/{id} [put]
 func (a *API) Update(w http.ResponseWriter, r *http.Request) {
 
@@ -193,11 +194,10 @@ func (a *API) Update(w http.ResponseWriter, r *http.Request) {
 //	@tags			newsletters
 //	@accept			json
 //	@produce		json
-//	@param			id
-//	@success		200
-//	@failure		400	{object}	err.Error
-//	@failure		404
-//	@failure		500	{object}	err.Error
+//	@param			id		path		string	true	"Newsletter ID"
+//	@success		204
+//	@failure		400		{object}	err.Error
+//	@failure		500		{object}	err.Error
 //	@router			/newsletters/{id} [delete]
 func (a *API) Delete(w http.ResponseWriter, r *http.Request) {
 

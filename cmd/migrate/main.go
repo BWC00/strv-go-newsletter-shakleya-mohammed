@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/pressly/goose/v3"
 
 	"github.com/bwc00/strv-go-newsletter-shakleya-mohammed/config"
@@ -44,7 +45,7 @@ func main() {
 
 	db, err2 := goose.OpenDBWithDriver(dialect, dbString)
 	if err2 != nil {
-		log.Fatalf(err.Error())
+		log.Fatalf(err2.Error())
 	}
 
 	defer func() {
