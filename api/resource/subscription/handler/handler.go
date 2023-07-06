@@ -132,7 +132,7 @@ func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
 	} else {
 		unsubscribeURL = fmt.Sprintf("http://%s/api/%s/subscriptions?id=%s", r.Host, apiVersion, subscriptionID)
 	}
-	htmlContent := fmt.Sprintf("Subscribed! link to unsubscribe: <a href='%s'>unsubscribeYou</a>", unsubscribeURL)
+	htmlContent := fmt.Sprintf("Subscribed!<br><br>Link to unsubscribe: <a href='%s'>link</a>", unsubscribeURL)
 
 	// Send email
 	if err := email.Send(
@@ -167,11 +167,16 @@ func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
 //	@produce		json
 //	@param			id		path		string	true	"Subscription ID"
 //	@success		204
+//	@failure		400		{object}	err.Error
 //	@failure		500		{object}	err.Error
 //	@router			/subscriptions [delete]
 func (a *API) Unsubscribe(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the subscription ID from the query parameter
 	subscriptionID := r.URL.Query().Get("id")
+	if subscriptionID == "" {
+		e.BadRequest(w, e.InvalidIdInUrlParam)
+		return
+	}
 
 	// Delete the subscription
 	if err := a.repository.Unsubscribe(subscriptionID); err != nil {
