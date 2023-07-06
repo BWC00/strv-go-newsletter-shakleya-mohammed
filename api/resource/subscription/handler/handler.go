@@ -123,8 +123,6 @@ func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
 	// Get api version
 	apiVersion := r.Context().Value(validator.ApiVersionKeyID).(string)
 
-	fmt.Println("AAAAAAAAAAAAAAAAAAA::::::::", apiVersion)
-
 	// Prepare email subscription confirmation (change if in production)
 	subject := "Subscribed to newsletter!"
 	plainTextContent := "Subscribed to newsletter!"
@@ -178,6 +176,9 @@ func (a *API) Unsubscribe(w http.ResponseWriter, r *http.Request) {
 
 	// Log successful unsubscription
 	a.logger.Info().Msg("unsubscribed to newsletter")
+
+	// Write message confirmation
+	fmt.Fprint(w, "Unsubscribed to newsletter!")
 
 	// Return 204 No Content status
 	w.WriteHeader(http.StatusNoContent)
