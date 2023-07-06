@@ -132,7 +132,6 @@ func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
 	} else {
 		unsubscribeURL = fmt.Sprintf("http://%s/api/%s/subscriptions?id=%s", r.Host, apiVersion, subscriptionID)
 	}
-	fmt.Println("URLLLLLLLLLLL:", unsubscribeURL)
 	htmlContent := fmt.Sprintf("Subscribed! link to unsubscribe: <a href='%s'>unsubscribeYou</a>", unsubscribeURL)
 
 	// Send email
