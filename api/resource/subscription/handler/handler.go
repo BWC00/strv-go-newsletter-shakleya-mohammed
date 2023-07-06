@@ -123,10 +123,17 @@ func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
 	// Get api version
 	apiVersion := r.Context().Value(validator.ApiVersionKeyID).(string)
 
-	// Prepare email subscription confirmation (change if in production)
+	// Prepare email subscription confirmation
 	subject := "Subscribed to newsletter!"
 	plainTextContent := "Subscribed to newsletter!"
-	htmlContent := fmt.Sprintf("Subscribed! link to unsubscribe: <a href='http://localhost:8080/api/%s/subscriptions?id=%s'>unsubscribeYou</a>", apiVersion, subscriptionID)
+	var unsubscribeURL string
+	if r.TLS != nil {
+		unsubscribeURL = fmt.Sprintf("https://%s/api/%s/subscriptions?id=%s", r.Host, apiVersion, subscriptionID)
+	} else {
+		unsubscribeURL = fmt.Sprintf("http://%s/api/%s/subscriptions?id=%s", r.Host, apiVersion, subscriptionID)
+	}
+	fmt.Println("URLLLLLLLLLLL:", unsubscribeURL)
+	htmlContent := fmt.Sprintf("Subscribed! link to unsubscribe: <a href='%s'>unsubscribeYou</a>", unsubscribeURL)
 
 	// Send email
 	if err := email.Send(
