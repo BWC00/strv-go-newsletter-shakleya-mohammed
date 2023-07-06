@@ -128,7 +128,7 @@ func (a *API) Subscribe(w http.ResponseWriter, r *http.Request) {
 	// Prepare email subscription confirmation (change if in production)
 	subject := "Subscribed to newsletter!"
 	plainTextContent := "Subscribed to newsletter!"
-	htmlContent := fmt.Sprintf("Subscribed! link to unsubscribe: <a href='http://localhost:8080/api/v%s/subscriptions?id=%s'>unsubscribeYou</a>", apiVersion, subscriptionID)
+	htmlContent := fmt.Sprintf("Subscribed! link to unsubscribe: <a href='http://localhost:8080/api/%s/subscriptions?id=%s'>unsubscribeYou</a>", apiVersion, subscriptionID)
 
 	// Send email
 	if err := email.Send(
